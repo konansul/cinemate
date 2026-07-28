@@ -49,6 +49,10 @@ struct MovieDetailView: View {
                     Text(overview).foregroundStyle(.secondary)
                 }
 
+                if let collection = movie.belongsToCollection {
+                    collectionSection(collection)
+                }
+
                 if !movie.topCast.isEmpty { castSection }
 
                 if !viewModel.reviews.isEmpty { reviewsSection }
@@ -215,6 +219,36 @@ struct MovieDetailView: View {
         }
     }
 
+    private func collectionSection(_ collection: BelongsToCollection) -> some View {
+        NavigationLink(value: collection) {
+            HStack(spacing: 12) {
+                AsyncImage(url: TMDBConfig.posterURL(collection.posterPath, size: "w185")) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    ZStack {
+                        Rectangle().fill(Color.gray.opacity(0.25))
+                        Image(systemName: "square.stack").foregroundStyle(.secondary)
+                    }
+                }
+                .frame(width: 50, height: 75)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Part of").font(.caption).foregroundStyle(.secondary)
+                    Text(collection.name).font(.headline).lineLimit(2)
+                    Text("See all movies").font(.caption).foregroundStyle(.blue)
+                }
+
+                Spacer()
+                Image(systemName: "chevron.right").font(.footnote).foregroundStyle(.tertiary)
+            }
+            .padding(12)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+    }
+
     private var reviewsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -255,12 +289,15 @@ struct MovieDetailView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(movie.genres ?? []) { genre in
-                    Text(genre.name)
-                        .font(.caption)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.gray.opacity(0.2))
-                        .clipShape(Capsule())
+                    NavigationLink(value: genre) {
+                        Text(genre.name)
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.gray.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

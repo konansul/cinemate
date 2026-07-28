@@ -64,6 +64,25 @@ struct TMDBService {
         try await fetchList("/movie/\(id)/recommendations")
     }
 
+    func person(id: Int) async throws -> Person {
+        try await get("/person/\(id)", query: [
+            URLQueryItem(name: "append_to_response", value: "movie_credits")
+        ])
+    }
+
+    func collection(id: Int) async throws -> MovieCollection {
+        try await get("/collection/\(id)")
+    }
+
+    func discover(genreId: Int, page: Int = 1) async throws -> MovieResponse {
+        try await get("/discover/movie", query: [
+            URLQueryItem(name: "with_genres", value: String(genreId)),
+            URLQueryItem(name: "sort_by", value: "popularity.desc"),
+            URLQueryItem(name: "include_adult", value: "false"),
+            URLQueryItem(name: "page", value: String(page))
+        ])
+    }
+
     func reviews(id: Int) async throws -> [Review] {
         let response: ReviewResponse = try await get("/movie/\(id)/reviews")
         return response.results

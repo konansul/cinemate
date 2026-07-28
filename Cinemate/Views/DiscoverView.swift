@@ -22,9 +22,21 @@ struct DiscoverView: View {
                 .navigationDestination(for: Movie.self) { movie in
                     MovieDetailView(movie: movie)
                 }
+                .navigationDestination(for: CastMember.self) { member in
+                    PersonDetailView(castMember: member)
+                }
+                .navigationDestination(for: Genre.self) { genre in
+                    GenreMoviesView(genre: genre)
+                }
+                .navigationDestination(for: BelongsToCollection.self) { collection in
+                    CollectionView(collection: collection)
+                }
                 .toolbar(.hidden, for: .navigationBar)
                 .task {
                     if viewModel.isEmpty { await viewModel.load() }
+                }
+                .task {
+                    await viewModel.loadFranchises()
                 }
                 .task(id: searchVM.query) {
                     try? await Task.sleep(for: .milliseconds(350))
@@ -67,9 +79,11 @@ struct DiscoverView: View {
                     if isSearching {
                         searchResults
                     } else {
+                        genreRow
                         MovieCarouselRow(title: "Trending This Week", movies: viewModel.trending)
                         MovieCarouselRow(title: "For You", movies: viewModel.forYou)
                         MovieCarouselRow(title: "Popular", movies: viewModel.popular)
+                        franchisesRow
                         MovieCarouselRow(title: "Top Rated", movies: viewModel.topRated)
                         MovieCarouselRow(title: "Upcoming", movies: viewModel.upcoming)
                     }
@@ -77,6 +91,44 @@ struct DiscoverView: View {
                 .padding(.bottom)
             }
             .refreshable { await viewModel.load() }
+        }
+    }
+
+    @ViewBuilder
+    private var franchisesRow: some View {
+        if !viewModel.franchises.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Franchises")
+                    .font(.title2.bold())
+                    .padding(.horizontal)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 14) {
+                        ForEach(viewModel.franchises) { collection in
+                            CollectionCard(collection: collection)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+
+    private var genreRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(GenreCatalog.all) { genre in
+                    NavigationLink(value: genre) {
+                        Text(genre.name)
+                            .font(.subheadline.weight(.medium))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(Color.gray.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal)
         }
     }
 

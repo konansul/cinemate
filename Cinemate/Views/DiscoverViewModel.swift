@@ -8,6 +8,7 @@ final class DiscoverViewModel {
     var topRated: [Movie] = []
     var upcoming: [Movie] = []
     var forYou: [Movie] = []
+    var franchises: [MovieCollection] = []
 
     var isLoading = false
     var errorMessage: String?
@@ -39,5 +40,20 @@ final class DiscoverViewModel {
 
     func loadForYou(seedId: Int) async {
         forYou = (try? await TMDBService.shared.recommendations(id: seedId)) ?? []
+    }
+
+    func loadFranchises() async {
+        guard franchises.isEmpty else { return }
+        let ids = FranchiseCatalog.ids
+        var loaded: [Int: MovieCollection] = [:]
+        await withTaskGroup(of: MovieCollection?.self) { group in
+            for id in ids {
+                group.addTask { try? await TMDBService.shared.collection(id: id) }
+            }
+            for await result in group {
+                if let collection = result { loaded[collection.id] = collection }
+            }
+        }
+        franchises = ids.compactMap { loaded[$0] }
     }
 }

@@ -14,6 +14,7 @@ struct Movie: Identifiable, Codable, Hashable {
     let tagline: String?
     let credits: Credits?
     let videos: Videos?
+    let belongsToCollection: BelongsToCollection?
 }
 
 struct Genre: Codable, Hashable, Identifiable {

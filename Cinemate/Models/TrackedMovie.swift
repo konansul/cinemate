@@ -49,7 +49,8 @@ extension TrackedMovie {
             genres: nil,
             tagline: nil,
             credits: nil,
-            videos: nil
+            videos: nil,
+            belongsToCollection: nil
         )
     }
 }

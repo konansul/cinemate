@@ -85,6 +85,9 @@ struct MyListView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Movie.self) { MovieDetailView(movie: $0) }
+            .navigationDestination(for: CastMember.self) { PersonDetailView(castMember: $0) }
+            .navigationDestination(for: Genre.self) { GenreMoviesView(genre: $0) }
+            .navigationDestination(for: BelongsToCollection.self) { CollectionView(collection: $0) }
             .sheet(isPresented: $showSettings) { SettingsView() }
         }
     }
