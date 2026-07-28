@@ -1,0 +1,35 @@
+import SwiftUI
+
+struct MixedCarouselRow: View {
+    let title: String
+    let items: [MediaItem]
+
+    var body: some View {
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .font(.title2.bold())
+                    .padding(.horizontal)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 14) {
+                        ForEach(items) { item in
+                            if let show = item.show {
+                                NavigationLink(value: show) {
+                                    PosterCard(movie: show.asMovie)
+                                }
+                                .buttonStyle(.plain)
+                            } else if let movie = item.movie {
+                                NavigationLink(value: movie) {
+                                    PosterCard(movie: movie)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+}

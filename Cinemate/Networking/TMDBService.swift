@@ -42,7 +42,33 @@ struct TMDBService {
     }
 
     func upcoming() async throws -> [Movie] {
-        try await fetchList("/movie/upcoming")
+        try await fetchList("/discover/movie", query: [
+            URLQueryItem(name: "sort_by", value: "popularity.desc"),
+            URLQueryItem(name: "primary_release_date.gte", value: Self.todayString()),
+            URLQueryItem(name: "include_adult", value: "false")
+        ])
+    }
+
+    func trendingAll() async throws -> [MediaItem] {
+        let response: MediaListResponse = try await get("/trending/all/week")
+        return response.results.compactMap { $0.asMediaItem }
+    }
+
+    func searchMulti(_ query: String) async throws -> [MediaItem] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        let response: MediaListResponse = try await get("/search/multi", query: [
+            URLQueryItem(name: "query", value: trimmed),
+            URLQueryItem(name: "include_adult", value: "false")
+        ])
+        return response.results.compactMap { $0.asMediaItem }
+    }
+
+    static func todayString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.string(from: Date())
     }
 
     func search(_ query: String) async throws -> [Movie] {
@@ -95,6 +121,60 @@ struct TMDBService {
             ?? response.results["US"]
             ?? response.results.values.first
         return country?.flatrate ?? []
+    }
+
+    func trendingTV() async throws -> [TVShow] {
+        try await fetchTVList("/trending/tv/week")
+    }
+
+    func popularTV() async throws -> [TVShow] {
+        try await fetchTVList("/tv/popular")
+    }
+
+    func topRatedTV() async throws -> [TVShow] {
+        try await fetchTVList("/tv/top_rated")
+    }
+
+    func onTheAirTV() async throws -> [TVShow] {
+        try await fetchTVList("/tv/on_the_air")
+    }
+
+    func searchTV(_ query: String) async throws -> [TVShow] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        return try await fetchTVList("/search/tv", query: [
+            URLQueryItem(name: "query", value: trimmed),
+            URLQueryItem(name: "include_adult", value: "false")
+        ])
+    }
+
+    func tvDetails(id: Int) async throws -> TVShow {
+        try await get("/tv/\(id)", query: [
+            URLQueryItem(name: "append_to_response", value: "credits,videos")
+        ])
+    }
+
+    func season(showId: Int, seasonNumber: Int) async throws -> SeasonDetail {
+        try await get("/tv/\(showId)/season/\(seasonNumber)")
+    }
+
+    func tvReviews(id: Int) async throws -> [Review] {
+        let response: ReviewResponse = try await get("/tv/\(id)/reviews")
+        return response.results
+    }
+
+    func tvWatchProviders(id: Int) async throws -> [WatchProvider] {
+        let response: WatchProvidersResponse = try await get("/tv/\(id)/watch/providers")
+        let region = Locale.current.region?.identifier ?? "US"
+        let country = response.results[region]
+            ?? response.results["US"]
+            ?? response.results.values.first
+        return country?.flatrate ?? []
+    }
+
+    private func fetchTVList(_ path: String, query: [URLQueryItem] = []) async throws -> [TVShow] {
+        let response: TVResponse = try await get(path, query: query)
+        return response.results
     }
 
     private func fetchList(_ path: String, query: [URLQueryItem] = []) async throws -> [Movie] {

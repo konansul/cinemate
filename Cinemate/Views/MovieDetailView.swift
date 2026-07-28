@@ -8,13 +8,14 @@ struct MovieDetailView: View {
     @State private var noteText: String = ""
     @State private var showingReviews = false
     @State private var showingCast = false
+    @State private var notificationsAuthorized = false
 
     init(movie: Movie) {
         _viewModel = State(initialValue: MovieDetailViewModel(movie: movie))
     }
 
     private var movie: Movie { viewModel.movie }
-    private var record: TrackedMovie? { tracked.first { $0.id == movie.id } }
+    private var record: TrackedMovie? { tracked.first { $0.id == movie.id && $0.mediaType == "movie" } }
     private var shareURL: URL? { URL(string: "https://www.themoviedb.org/movie/\(movie.id)") }
 
     var body: some View {
@@ -25,6 +26,8 @@ struct MovieDetailView: View {
                 metaRow
 
                 if !(movie.genres ?? []).isEmpty { genreChips }
+
+                if record?.inWatchlist == true, movie.isUpcoming { reminderBanner }
 
                 ratingRow
                 noteEditor
@@ -79,8 +82,43 @@ struct MovieDetailView: View {
         }
         .task {
             noteText = record?.note ?? ""
+            notificationsAuthorized = await NotificationManager.shared.isAuthorized()
             await viewModel.loadDetails()
         }
+    }
+
+    private var reminderBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "bell.badge.fill")
+                .font(.title3)
+                .foregroundStyle(.blue)
+
+            if notificationsAuthorized {
+                Text("We'll remind you when it's out — \(movie.releaseDisplayText)")
+                    .font(.subheadline)
+                Spacer(minLength: 0)
+            } else {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Get a release reminder").font(.subheadline.weight(.semibold))
+                    Text("Out \(movie.releaseDisplayText)").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Button("Enable") { Task { await enableReminder() } }
+                    .font(.subheadline.weight(.semibold))
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+            }
+        }
+        .padding(12)
+        .background(Color.blue.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func enableReminder() async {
+        await NotificationManager.shared.scheduleReleaseReminder(
+            movieId: movie.id, title: movie.title, releaseDate: movie.releaseDate
+        )
+        notificationsAuthorized = await NotificationManager.shared.isAuthorized()
     }
 
     private var posterHeader: some View {
@@ -316,7 +354,20 @@ struct MovieDetailView: View {
     }
 
     private func toggleWatchlist() {
-        let r = ensureRecord(); r.inWatchlist.toggle(); pruneIfEmpty(r)
+        let r = ensureRecord()
+        r.inWatchlist.toggle()
+        let isOn = r.inWatchlist
+        pruneIfEmpty(r)
+        Task {
+            if isOn {
+                await NotificationManager.shared.scheduleReleaseReminder(
+                    movieId: movie.id, title: movie.title, releaseDate: movie.releaseDate
+                )
+                notificationsAuthorized = await NotificationManager.shared.isAuthorized()
+            } else {
+                NotificationManager.shared.cancelReleaseReminder(movieId: movie.id)
+            }
+        }
     }
 
     private func toggleWatched() {

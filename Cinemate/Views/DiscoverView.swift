@@ -31,6 +31,9 @@ struct DiscoverView: View {
                 .navigationDestination(for: BelongsToCollection.self) { collection in
                     CollectionView(collection: collection)
                 }
+                .navigationDestination(for: TVShow.self) { show in
+                    TVDetailView(show: show)
+                }
                 .toolbar(.hidden, for: .navigationBar)
                 .task {
                     if viewModel.isEmpty { await viewModel.load() }
@@ -56,7 +59,7 @@ struct DiscoverView: View {
     private var content: some View {
         if let error = viewModel.errorMessage, viewModel.isEmpty {
             ContentUnavailableView {
-                Label("Can't load movies", systemImage: "film.stack")
+                Label("Can't load", systemImage: "film.stack")
             } description: {
                 Text(error)
             } actions: {
@@ -64,7 +67,7 @@ struct DiscoverView: View {
                     .buttonStyle(.borderedProminent)
             }
         } else if viewModel.isEmpty && viewModel.isLoading {
-            ProgressView("Loading movies…")
+            ProgressView("Loading…")
         } else {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
@@ -80,10 +83,11 @@ struct DiscoverView: View {
                         searchResults
                     } else {
                         genreRow
-                        MovieCarouselRow(title: "Trending This Week", movies: viewModel.trending)
+                        MixedCarouselRow(title: "Trending This Week", items: viewModel.trendingMixed)
                         MovieCarouselRow(title: "For You", movies: viewModel.forYou)
-                        MovieCarouselRow(title: "Popular", movies: viewModel.popular)
+                        MixedCarouselRow(title: "Popular", items: viewModel.popularMixed)
                         franchisesRow
+                        ShowCarouselRow(title: "TV Shows", shows: viewModel.tvShows)
                         MovieCarouselRow(title: "Top Rated", movies: viewModel.topRated)
                         MovieCarouselRow(title: "Upcoming", movies: viewModel.upcoming)
                     }
@@ -142,11 +146,18 @@ struct DiscoverView: View {
             ContentUnavailableView.search(text: searchVM.query)
         } else {
             LazyVGrid(columns: grid, spacing: 18) {
-                ForEach(searchVM.results) { movie in
-                    NavigationLink(value: movie) {
-                        GridPosterCard(movie: movie)
+                ForEach(searchVM.results) { item in
+                    if let show = item.show {
+                        NavigationLink(value: show) {
+                            GridPosterCard(movie: show.asMovie)
+                        }
+                        .buttonStyle(.plain)
+                    } else if let movie = item.movie {
+                        NavigationLink(value: movie) {
+                            GridPosterCard(movie: movie)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal)

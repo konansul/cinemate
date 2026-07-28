@@ -4,7 +4,7 @@ import Observation
 @Observable
 final class SearchViewModel {
     var query = ""
-    var results: [Movie] = []
+    var results: [MediaItem] = []
     var isSearching = false
     var hasSearched = false
 
@@ -17,7 +17,7 @@ final class SearchViewModel {
         }
         isSearching = true
         hasSearched = true
-        results = (try? await TMDBService.shared.search(trimmed)) ?? []
+        results = (try? await TMDBService.shared.searchMulti(trimmed)) ?? []
         isSearching = false
     }
 }

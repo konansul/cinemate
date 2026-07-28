@@ -10,6 +10,7 @@ final class TrackedMovie {
     var backdropPath: String? = nil
     var releaseDate: String? = nil
     var voteAverage: Double? = nil
+    var mediaType: String = "movie"
 
     var isFavorite: Bool = false
     var isWatched: Bool = false
@@ -27,8 +28,23 @@ final class TrackedMovie {
         self.backdropPath = movie.backdropPath
         self.releaseDate = movie.releaseDate
         self.voteAverage = movie.voteAverage
+        self.mediaType = "movie"
         self.addedAt = Date()
     }
+
+    init(show: TVShow) {
+        self.id = show.id
+        self.title = show.name
+        self.overview = show.overview
+        self.posterPath = show.posterPath
+        self.backdropPath = show.backdropPath
+        self.releaseDate = show.firstAirDate
+        self.voteAverage = show.voteAverage
+        self.mediaType = "tv"
+        self.addedAt = Date()
+    }
+
+    var isTV: Bool { mediaType == "tv" }
 
     var isEmpty: Bool {
         !isFavorite && !isWatched && !inWatchlist && userRating == 0 && note.isEmpty
@@ -51,6 +67,26 @@ extension TrackedMovie {
             credits: nil,
             videos: nil,
             belongsToCollection: nil
+        )
+    }
+
+    var asShow: TVShow {
+        TVShow(
+            id: id,
+            name: title,
+            overview: overview,
+            posterPath: posterPath,
+            backdropPath: backdropPath,
+            firstAirDate: releaseDate,
+            voteAverage: voteAverage,
+            numberOfSeasons: nil,
+            numberOfEpisodes: nil,
+            episodeRunTime: nil,
+            genres: nil,
+            tagline: nil,
+            seasons: nil,
+            credits: nil,
+            videos: nil
         )
     }
 }

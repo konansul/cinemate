@@ -63,4 +63,24 @@ extension Movie {
     var topCast: [CastMember] {
         Array((credits?.cast ?? []).prefix(12))
     }
+
+    var releaseDateValue: Date? {
+        guard let releaseDate, !releaseDate.isEmpty else { return nil }
+        let parser = DateFormatter()
+        parser.dateFormat = "yyyy-MM-dd"
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        return parser.date(from: releaseDate)
+    }
+
+    var isUpcoming: Bool {
+        guard let releaseDateValue else { return false }
+        return releaseDateValue > Date()
+    }
+
+    var releaseDisplayText: String {
+        guard let releaseDateValue else { return "" }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: releaseDateValue)
+    }
 }

@@ -3,18 +3,19 @@ import Observation
 
 @Observable
 final class DiscoverViewModel {
-    var trending: [Movie] = []
-    var popular: [Movie] = []
+    var trendingMixed: [MediaItem] = []
+    var popularMixed: [MediaItem] = []
+    var forYou: [Movie] = []
     var topRated: [Movie] = []
     var upcoming: [Movie] = []
-    var forYou: [Movie] = []
     var franchises: [MovieCollection] = []
+    var tvShows: [TVShow] = []
 
     var isLoading = false
     var errorMessage: String?
 
     var isEmpty: Bool {
-        trending.isEmpty && popular.isEmpty && topRated.isEmpty && upcoming.isEmpty
+        trendingMixed.isEmpty && popularMixed.isEmpty && topRated.isEmpty && upcoming.isEmpty
     }
 
     func load() async {
@@ -22,15 +23,18 @@ final class DiscoverViewModel {
         errorMessage = nil
 
         do {
-            async let trending = TMDBService.shared.trending()
-            async let popular = TMDBService.shared.popular()
+            async let trendingMixed = TMDBService.shared.trendingAll()
+            async let popularMovies = TMDBService.shared.popular()
+            async let popularShows = TMDBService.shared.popularTV()
             async let topRated = TMDBService.shared.topRated()
             async let upcoming = TMDBService.shared.upcoming()
+            async let tvShows = TMDBService.shared.trendingTV()
 
-            self.trending = try await trending
-            self.popular = try await popular
+            self.trendingMixed = try await trendingMixed
+            self.popularMixed = Self.interleave(try await popularMovies, try await popularShows)
             self.topRated = try await topRated
             self.upcoming = try await upcoming
+            self.tvShows = try await tvShows
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
@@ -55,5 +59,17 @@ final class DiscoverViewModel {
             }
         }
         franchises = ids.compactMap { loaded[$0] }
+    }
+
+    static func interleave(_ movies: [Movie], _ shows: [TVShow]) -> [MediaItem] {
+        let movieItems = movies.prefix(12).map { MediaItem(movie: $0) }
+        let showItems = shows.prefix(12).map { MediaItem(show: $0) }
+        var result: [MediaItem] = []
+        let maxCount = max(movieItems.count, showItems.count)
+        for index in 0..<maxCount {
+            if index < movieItems.count { result.append(movieItems[index]) }
+            if index < showItems.count { result.append(showItems[index]) }
+        }
+        return result
     }
 }

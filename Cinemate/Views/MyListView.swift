@@ -72,10 +72,17 @@ struct MyListView: View {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 18) {
                             ForEach(shown) { item in
-                                NavigationLink(value: item.asMovie) {
-                                    GridPosterCard(movie: item.asMovie)
+                                if item.isTV {
+                                    NavigationLink(value: item.asShow) {
+                                        GridPosterCard(movie: item.asShow.asMovie)
+                                    }
+                                    .buttonStyle(.plain)
+                                } else {
+                                    NavigationLink(value: item.asMovie) {
+                                        GridPosterCard(movie: item.asMovie)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
                         }
                         .padding(.horizontal)
@@ -88,7 +95,14 @@ struct MyListView: View {
             .navigationDestination(for: CastMember.self) { PersonDetailView(castMember: $0) }
             .navigationDestination(for: Genre.self) { GenreMoviesView(genre: $0) }
             .navigationDestination(for: BelongsToCollection.self) { CollectionView(collection: $0) }
+            .navigationDestination(for: TVShow.self) { TVDetailView(show: $0) }
             .sheet(isPresented: $showSettings) { SettingsView() }
+            .task {
+                let items = tracked
+                    .filter { $0.inWatchlist }
+                    .map { (id: $0.id, title: $0.title, releaseDate: $0.releaseDate) }
+                await NotificationManager.shared.syncReleaseReminders(for: items)
+            }
         }
     }
 
