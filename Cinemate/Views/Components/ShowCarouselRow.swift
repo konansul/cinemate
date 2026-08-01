@@ -3,13 +3,12 @@ import SwiftUI
 struct ShowCarouselRow: View {
     let title: String
     let shows: [TVShow]
+    var feed: DiscoverFeed? = nil
 
     var body: some View {
         if !shows.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text(title)
-                    .font(.title2.bold())
-                    .padding(.horizontal)
+                CarouselHeader(title: title, feed: feed)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 14) {

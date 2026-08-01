@@ -6,9 +6,8 @@ struct TVDetailView: View {
     @Query private var tracked: [TrackedMovie]
     @State private var viewModel: TVDetailViewModel
     @State private var noteText: String = ""
-    @State private var showingReviews = false
-    @State private var showingCast = false
     @State private var selectedSeason: Season?
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     init(show: TVShow) {
         _viewModel = State(initialValue: TVDetailViewModel(show: show))
@@ -19,53 +18,45 @@ struct TVDetailView: View {
     private var shareURL: URL? { URL(string: "https://www.themoviedb.org/tv/\(show.id)") }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                posterHeader
-                metaRow
+        GeometryReader { geo in
+            let wide = sizeClass == .regular
+            let posterW = min(380, geo.size.width * 0.4)
+            ScrollView {
+                if wide {
+                    HStack(alignment: .top, spacing: 28) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            posterHeader
+                            metaGenres
+                            ratingRow
+                            noteEditor
+                        }
+                        .frame(width: posterW)
 
-                if !(show.genres ?? []).isEmpty { genreChips }
-
-                ratingRow
-                noteEditor
-
-                if let trailer = show.trailerURL {
-                    Link(destination: trailer) {
-                        Label("Play Trailer", systemImage: "play.fill")
-                            .frame(maxWidth: .infinity)
+                        VStack(alignment: .leading, spacing: 16) {
+                            mediaSections
+                        }
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+                        posterHeader
+                        metaGenres
+                        ratingRow
+                        noteEditor
+                        mediaSections
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .frame(maxWidth: 640)
+                    .frame(maxWidth: .infinity)
                 }
-
-                if let backdrop = TMDBConfig.backdropURL(show.backdropPath) {
-                    backdropSection(backdrop)
-                }
-
-                if !viewModel.providers.isEmpty { providersSection }
-
-                if let overview = show.overview, !overview.isEmpty {
-                    sectionTitle("Overview")
-                    Text(overview).foregroundStyle(.secondary)
-                }
-
-                if !show.displayableSeasons.isEmpty { seasonsSection }
-
-                if !show.topCast.isEmpty { castSection }
-
-                if !viewModel.reviews.isEmpty { reviewsSection }
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
         }
         .navigationTitle(show.name)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showingReviews) {
-            ReviewsView(movie: show.asMovie, reviews: viewModel.reviews)
-        }
-        .navigationDestination(isPresented: $showingCast) {
-            CastListView(movie: show.asMovie, cast: show.credits?.cast ?? show.topCast)
-        }
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .navigationDestination(item: $selectedSeason) { season in
             SeasonView(showId: show.id, showName: show.name, season: season)
         }
@@ -79,9 +70,47 @@ struct TVDetailView: View {
             }
         }
         .task {
+            AppAnalytics.screen("TV Detail")
+            AppAnalytics.openShow(id: show.id, name: show.name)
             noteText = record?.note ?? ""
             await viewModel.loadDetails()
         }
+    }
+
+    @ViewBuilder
+    private var metaGenres: some View {
+        metaRow
+
+        if !(show.genres ?? []).isEmpty { genreChips }
+    }
+
+    @ViewBuilder
+    private var mediaSections: some View {
+        if let trailer = show.trailerURL {
+            Link(destination: trailer) {
+                Label("Play Trailer", systemImage: "play.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+
+        if let backdrop = TMDBConfig.backdropURL(show.backdropPath) {
+            backdropSection(backdrop)
+        }
+
+        if !viewModel.providers.isEmpty { providersSection }
+
+        if let overview = show.overview, !overview.isEmpty {
+            sectionTitle("Overview")
+            Text(overview).foregroundStyle(.secondary)
+        }
+
+        if !show.displayableSeasons.isEmpty { seasonsSection }
+
+        if !show.topCast.isEmpty { castSection }
+
+        if !viewModel.reviews.isEmpty { reviewsSection }
     }
 
     private var posterHeader: some View {
@@ -118,31 +147,33 @@ struct TVDetailView: View {
     }
 
     private func backdropSection(_ url: URL) -> some View {
-        AsyncImage(url: url) { image in
-            image.resizable().aspectRatio(contentMode: .fill)
-        } placeholder: {
-            LinearGradient(
-                colors: [Color.gray.opacity(0.35), Color.gray.opacity(0.15)],
-                startPoint: .top, endPoint: .bottom
-            )
-        }
-        .frame(height: 200)
-        .frame(maxWidth: .infinity)
-        .clipped()
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        Color.clear
+            .aspectRatio(16.0 / 9.0, contentMode: .fit)
+            .overlay {
+                AsyncImage(url: url) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    LinearGradient(
+                        colors: [Color.gray.opacity(0.35), Color.gray.opacity(0.15)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                }
+            }
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private var overlayActions: some View {
         HStack(spacing: 10) {
-            overlayButton("Watchlist",
-                          systemImage: record?.inWatchlist == true ? "bookmark.fill" : "bookmark",
-                          color: .blue, active: record?.inWatchlist == true, action: toggleWatchlist)
-            overlayButton("Watched",
-                          systemImage: record?.isWatched == true ? "checkmark.circle.fill" : "checkmark.circle",
-                          color: .green, active: record?.isWatched == true, action: toggleWatched)
             overlayButton("Favorite",
                           systemImage: record?.isFavorite == true ? "heart.fill" : "heart",
                           color: .red, active: record?.isFavorite == true, action: toggleFavorite)
+            overlayButton("Watched",
+                          systemImage: record?.isWatched == true ? "checkmark.circle.fill" : "checkmark.circle",
+                          color: .green, active: record?.isWatched == true, action: toggleWatched)
+            overlayButton("Watchlist",
+                          systemImage: record?.inWatchlist == true ? "bookmark.fill" : "bookmark",
+                          color: .blue, active: record?.inWatchlist == true, action: toggleWatchlist)
         }
     }
 
@@ -249,7 +280,7 @@ struct TVDetailView: View {
                 Text("Cast").font(.headline)
                 Spacer()
                 if (show.credits?.cast.count ?? 0) > show.topCast.count {
-                    Button("See All") { showingCast = true }
+                    NavigationLink("See All", value: CastListRoute(movie: show.asMovie, cast: show.credits?.cast ?? show.topCast))
                         .font(.subheadline.weight(.semibold))
                 }
             }
@@ -270,7 +301,7 @@ struct TVDetailView: View {
             HStack {
                 Text("Reviews").font(.headline)
                 Spacer()
-                Button("See All") { showingReviews = true }
+                NavigationLink("See All", value: ReviewsRoute(movie: show.asMovie, reviews: viewModel.reviews))
                     .font(.subheadline.weight(.semibold))
             }
             .padding(.top, 4)
@@ -283,9 +314,7 @@ struct TVDetailView: View {
 
     private var metaRow: some View {
         HStack(spacing: 14) {
-            Button {
-                showingReviews = true
-            } label: {
+            NavigationLink(value: ReviewsRoute(movie: show.asMovie, reviews: viewModel.reviews)) {
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill").foregroundStyle(.yellow)
                     Text(show.ratingText)
@@ -330,6 +359,7 @@ struct TVDetailView: View {
 
     private func toggleWatchlist() {
         let r = ensureRecord(); r.inWatchlist.toggle(); pruneIfEmpty(r)
+        AppAnalytics.trackAction("watchlist", id: show.id, mediaType: "tv")
     }
 
     private func toggleWatched() {
@@ -337,10 +367,12 @@ struct TVDetailView: View {
         r.isWatched.toggle()
         r.watchedDate = r.isWatched ? Date() : nil
         pruneIfEmpty(r)
+        AppAnalytics.trackAction("watched", id: show.id, mediaType: "tv")
     }
 
     private func toggleFavorite() {
         let r = ensureRecord(); r.isFavorite.toggle(); pruneIfEmpty(r)
+        AppAnalytics.trackAction("favorite", id: show.id, mediaType: "tv")
     }
 
     private func setRating(_ value: Int) {

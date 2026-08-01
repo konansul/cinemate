@@ -2,9 +2,9 @@ import SwiftUI
 import SwiftData
 
 enum LibraryFilter: String, CaseIterable, Identifiable {
-    case watchlist = "Watchlist"
-    case watched = "Watched"
     case favorites = "Favorites"
+    case watched = "Watched"
+    case watchlist = "Watchlist"
     var id: String { rawValue }
 
     var icon: String {
@@ -33,10 +33,10 @@ enum LibrarySort: String, CaseIterable, Identifiable {
 
 struct MyListView: View {
     @Query(sort: \TrackedMovie.addedAt, order: .reverse) private var tracked: [TrackedMovie]
-    @State private var filter: LibraryFilter = .watchlist
+    @State private var filter: LibraryFilter = .favorites
     @State private var sort: LibrarySort = .dateAdded
     @State private var showSettings = false
-    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     private func movies(for filter: LibraryFilter) -> [TrackedMovie] {
         switch filter {
@@ -57,45 +57,23 @@ struct MyListView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 14) {
-                header
-                filterCards
-
-                if shown.isEmpty {
-                    ContentUnavailableView(
-                        emptyTitle,
-                        systemImage: filter.icon,
-                        description: Text(emptyMessage)
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 18) {
-                            ForEach(shown) { item in
-                                if item.isTV {
-                                    NavigationLink(value: item.asShow) {
-                                        GridPosterCard(movie: item.asShow.asMovie)
-                                    }
-                                    .buttonStyle(.plain)
-                                } else {
-                                    NavigationLink(value: item.asMovie) {
-                                        GridPosterCard(movie: item.asMovie)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                    }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    header
+                    filterCards
+                    grid
                 }
+                .padding(.bottom)
             }
+            .sensoryFeedback(.selection, trigger: filter)
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Movie.self) { MovieDetailView(movie: $0) }
             .navigationDestination(for: CastMember.self) { PersonDetailView(castMember: $0) }
             .navigationDestination(for: Genre.self) { GenreMoviesView(genre: $0) }
             .navigationDestination(for: BelongsToCollection.self) { CollectionView(collection: $0) }
             .navigationDestination(for: TVShow.self) { TVDetailView(show: $0) }
+            .navigationDestination(for: CastListRoute.self) { CastListView(movie: $0.movie, cast: $0.cast) }
+            .navigationDestination(for: ReviewsRoute.self) { ReviewsView(movie: $0.movie, reviews: $0.reviews) }
             .sheet(isPresented: $showSettings) { SettingsView() }
             .task {
                 let items = tracked
@@ -103,6 +81,36 @@ struct MyListView: View {
                     .map { (id: $0.id, title: $0.title, releaseDate: $0.releaseDate) }
                 await NotificationManager.shared.syncReleaseReminders(for: items)
             }
+            .onAppear { AppAnalytics.screen("Library") }
+        }
+    }
+
+    @ViewBuilder
+    private var grid: some View {
+        if shown.isEmpty {
+            ContentUnavailableView(
+                emptyTitle,
+                systemImage: filter.icon,
+                description: Text(emptyMessage)
+            )
+            .frame(maxWidth: .infinity, minHeight: 320)
+        } else {
+            LazyVGrid(columns: columns, spacing: 18) {
+                ForEach(shown) { item in
+                    if item.isTV {
+                        NavigationLink(value: item.asShow) {
+                            GridPosterCard(movie: item.asShow.asMovie)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        NavigationLink(value: item.asMovie) {
+                            GridPosterCard(movie: item.asMovie)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .padding(.horizontal)
         }
     }
 
@@ -115,13 +123,15 @@ struct MyListView: View {
                     ForEach(LibrarySort.allCases) { Text($0.rawValue).tag($0) }
                 }
             } label: {
-                Image(systemName: "arrow.up.arrow.down").font(.title3).foregroundStyle(.primary)
+                Image(systemName: "arrow.up.arrow.down").font(.title3)
             }
+            .tint(.primary)
             Button {
                 showSettings = true
             } label: {
-                Image(systemName: "gearshape").font(.title3).foregroundStyle(.primary)
+                Image(systemName: "gearshape").font(.title3)
             }
+            .tint(.primary)
         }
         .padding(.horizontal)
         .padding(.top, 4)
@@ -139,7 +149,7 @@ struct MyListView: View {
     private func filterCard(_ option: LibraryFilter) -> some View {
         let active = (filter == option)
         return Button {
-            filter = option
+            withAnimation(.easeInOut(duration: 0.2)) { filter = option }
         } label: {
             VStack(spacing: 5) {
                 Image(systemName: option.icon).font(.subheadline)

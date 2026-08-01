@@ -6,9 +6,8 @@ struct MovieDetailView: View {
     @Query private var tracked: [TrackedMovie]
     @State private var viewModel: MovieDetailViewModel
     @State private var noteText: String = ""
-    @State private var showingReviews = false
-    @State private var showingCast = false
     @State private var notificationsAuthorized = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     init(movie: Movie) {
         _viewModel = State(initialValue: MovieDetailViewModel(movie: movie))
@@ -19,58 +18,45 @@ struct MovieDetailView: View {
     private var shareURL: URL? { URL(string: "https://www.themoviedb.org/movie/\(movie.id)") }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                posterHeader
+        GeometryReader { geo in
+            let wide = sizeClass == .regular
+            let posterW = min(380, geo.size.width * 0.4)
+            ScrollView {
+                if wide {
+                    HStack(alignment: .top, spacing: 28) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            posterHeader
+                            metaGenresReminder
+                            ratingRow
+                            noteEditor
+                        }
+                        .frame(width: posterW)
 
-                metaRow
-
-                if !(movie.genres ?? []).isEmpty { genreChips }
-
-                if record?.inWatchlist == true, movie.isUpcoming { reminderBanner }
-
-                ratingRow
-                noteEditor
-
-                if let trailer = movie.trailerURL {
-                    Link(destination: trailer) {
-                        Label("Play Trailer", systemImage: "play.fill")
-                            .frame(maxWidth: .infinity)
+                        VStack(alignment: .leading, spacing: 16) {
+                            mediaSections
+                        }
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+                        posterHeader
+                        metaGenresReminder
+                        ratingRow
+                        noteEditor
+                        mediaSections
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .frame(maxWidth: 640)
+                    .frame(maxWidth: .infinity)
                 }
-
-                if let backdrop = TMDBConfig.backdropURL(movie.backdropPath) {
-                    backdropSection(backdrop)
-                }
-
-                if !viewModel.providers.isEmpty { providersSection }
-
-                if let overview = movie.overview, !overview.isEmpty {
-                    sectionTitle("Overview")
-                    Text(overview).foregroundStyle(.secondary)
-                }
-
-                if let collection = movie.belongsToCollection {
-                    collectionSection(collection)
-                }
-
-                if !movie.topCast.isEmpty { castSection }
-
-                if !viewModel.reviews.isEmpty { reviewsSection }
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
         }
         .navigationTitle(movie.title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showingReviews) {
-            ReviewsView(movie: movie, reviews: viewModel.reviews)
-        }
-        .navigationDestination(isPresented: $showingCast) {
-            CastListView(movie: movie, cast: movie.credits?.cast ?? movie.topCast)
-        }
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if let shareURL {
@@ -81,10 +67,52 @@ struct MovieDetailView: View {
             }
         }
         .task {
+            AppAnalytics.screen("Movie Detail")
+            AppAnalytics.openMovie(id: movie.id, title: movie.title)
             noteText = record?.note ?? ""
             notificationsAuthorized = await NotificationManager.shared.isAuthorized()
             await viewModel.loadDetails()
         }
+    }
+
+    @ViewBuilder
+    private var metaGenresReminder: some View {
+        metaRow
+
+        if !(movie.genres ?? []).isEmpty { genreChips }
+
+        if record?.inWatchlist == true, movie.isUpcoming { reminderBanner }
+    }
+
+    @ViewBuilder
+    private var mediaSections: some View {
+        if let trailer = movie.trailerURL {
+            Link(destination: trailer) {
+                Label("Play Trailer", systemImage: "play.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+
+        if let backdrop = TMDBConfig.backdropURL(movie.backdropPath) {
+            backdropSection(backdrop)
+        }
+
+        if !viewModel.providers.isEmpty { providersSection }
+
+        if let overview = movie.overview, !overview.isEmpty {
+            sectionTitle("Overview")
+            Text(overview).foregroundStyle(.secondary)
+        }
+
+        if let collection = movie.belongsToCollection {
+            collectionSection(collection)
+        }
+
+        if !movie.topCast.isEmpty { castSection }
+
+        if !viewModel.reviews.isEmpty { reviewsSection }
     }
 
     private var reminderBanner: some View {
@@ -155,31 +183,33 @@ struct MovieDetailView: View {
     }
 
     private func backdropSection(_ url: URL) -> some View {
-        AsyncImage(url: url) { image in
-            image.resizable().aspectRatio(contentMode: .fill)
-        } placeholder: {
-            LinearGradient(
-                colors: [Color.gray.opacity(0.35), Color.gray.opacity(0.15)],
-                startPoint: .top, endPoint: .bottom
-            )
-        }
-        .frame(height: 200)
-        .frame(maxWidth: .infinity)
-        .clipped()
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        Color.clear
+            .aspectRatio(16.0 / 9.0, contentMode: .fit)
+            .overlay {
+                AsyncImage(url: url) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    LinearGradient(
+                        colors: [Color.gray.opacity(0.35), Color.gray.opacity(0.15)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                }
+            }
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private var overlayActions: some View {
         HStack(spacing: 10) {
-            overlayButton("Watchlist",
-                          systemImage: record?.inWatchlist == true ? "bookmark.fill" : "bookmark",
-                          color: .blue, active: record?.inWatchlist == true, action: toggleWatchlist)
-            overlayButton("Watched",
-                          systemImage: record?.isWatched == true ? "checkmark.circle.fill" : "checkmark.circle",
-                          color: .green, active: record?.isWatched == true, action: toggleWatched)
             overlayButton("Favorite",
                           systemImage: record?.isFavorite == true ? "heart.fill" : "heart",
                           color: .red, active: record?.isFavorite == true, action: toggleFavorite)
+            overlayButton("Watched",
+                          systemImage: record?.isWatched == true ? "checkmark.circle.fill" : "checkmark.circle",
+                          color: .green, active: record?.isWatched == true, action: toggleWatched)
+            overlayButton("Watchlist",
+                          systemImage: record?.inWatchlist == true ? "bookmark.fill" : "bookmark",
+                          color: .blue, active: record?.inWatchlist == true, action: toggleWatchlist)
         }
     }
 
@@ -241,7 +271,7 @@ struct MovieDetailView: View {
                 Text("Cast").font(.headline)
                 Spacer()
                 if (movie.credits?.cast.count ?? 0) > movie.topCast.count {
-                    Button("See All") { showingCast = true }
+                    NavigationLink("See All", value: CastListRoute(movie: movie, cast: movie.credits?.cast ?? movie.topCast))
                         .font(.subheadline.weight(.semibold))
                 }
             }
@@ -292,7 +322,7 @@ struct MovieDetailView: View {
             HStack {
                 Text("Reviews").font(.headline)
                 Spacer()
-                Button("See All") { showingReviews = true }
+                NavigationLink("See All", value: ReviewsRoute(movie: movie, reviews: viewModel.reviews))
                     .font(.subheadline.weight(.semibold))
             }
             .padding(.top, 4)
@@ -305,9 +335,7 @@ struct MovieDetailView: View {
 
     private var metaRow: some View {
         HStack(spacing: 14) {
-            Button {
-                showingReviews = true
-            } label: {
+            NavigationLink(value: ReviewsRoute(movie: movie, reviews: viewModel.reviews)) {
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill").foregroundStyle(.yellow)
                     Text(movie.ratingText)
@@ -358,6 +386,7 @@ struct MovieDetailView: View {
         r.inWatchlist.toggle()
         let isOn = r.inWatchlist
         pruneIfEmpty(r)
+        AppAnalytics.trackAction("watchlist", id: movie.id, mediaType: "movie")
         Task {
             if isOn {
                 await NotificationManager.shared.scheduleReleaseReminder(
@@ -375,10 +404,12 @@ struct MovieDetailView: View {
         r.isWatched.toggle()
         r.watchedDate = r.isWatched ? Date() : nil
         pruneIfEmpty(r)
+        AppAnalytics.trackAction("watched", id: movie.id, mediaType: "movie")
     }
 
     private func toggleFavorite() {
         let r = ensureRecord(); r.isFavorite.toggle(); pruneIfEmpty(r)
+        AppAnalytics.trackAction("favorite", id: movie.id, mediaType: "movie")
     }
 
     private func setRating(_ value: Int) {

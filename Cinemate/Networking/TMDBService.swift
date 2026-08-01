@@ -109,6 +109,39 @@ struct TMDBService {
         ])
     }
 
+    func trendingAllPaged(page: Int) async throws -> MediaListResponse {
+        try await get("/trending/all/week", query: [
+            URLQueryItem(name: "page", value: String(page))
+        ])
+    }
+
+    func popularPaged(page: Int) async throws -> MovieResponse {
+        try await get("/movie/popular", query: [
+            URLQueryItem(name: "page", value: String(page))
+        ])
+    }
+
+    func topRatedPaged(page: Int) async throws -> MovieResponse {
+        try await get("/movie/top_rated", query: [
+            URLQueryItem(name: "page", value: String(page))
+        ])
+    }
+
+    func upcomingPaged(page: Int) async throws -> MovieResponse {
+        try await get("/discover/movie", query: [
+            URLQueryItem(name: "sort_by", value: "popularity.desc"),
+            URLQueryItem(name: "primary_release_date.gte", value: Self.todayString()),
+            URLQueryItem(name: "include_adult", value: "false"),
+            URLQueryItem(name: "page", value: String(page))
+        ])
+    }
+
+    func trendingTVPaged(page: Int) async throws -> TVResponse {
+        try await get("/trending/tv/week", query: [
+            URLQueryItem(name: "page", value: String(page))
+        ])
+    }
+
     func reviews(id: Int) async throws -> [Review] {
         let response: ReviewResponse = try await get("/movie/\(id)/reviews")
         return response.results

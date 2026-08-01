@@ -35,6 +35,10 @@ final class DiscoverViewModel {
             self.topRated = try await topRated
             self.upcoming = try await upcoming
             self.tvShows = try await tvShows
+
+            WidgetBridge.saveTrending(self.trendingMixed.map {
+                WidgetFeedItem(title: $0.poster.title, posterPath: $0.poster.posterPath, backdropPath: $0.poster.backdropPath, isTV: $0.isTV)
+            })
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
@@ -44,6 +48,9 @@ final class DiscoverViewModel {
 
     func loadForYou(seedId: Int) async {
         forYou = (try? await TMDBService.shared.recommendations(id: seedId)) ?? []
+        WidgetBridge.saveForYou(forYou.map {
+            WidgetFeedItem(title: $0.title, posterPath: $0.posterPath, backdropPath: $0.backdropPath, isTV: false)
+        })
     }
 
     func loadFranchises() async {

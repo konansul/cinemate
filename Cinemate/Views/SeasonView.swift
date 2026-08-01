@@ -36,6 +36,7 @@ struct SeasonView: View {
         }
         .navigationTitle(season.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .task { await viewModel.load() }
     }
 

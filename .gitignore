@@ -6,3 +6,5 @@ build/
 
 
 Secrets.swift
+WidgetSecrets.swift
+GoogleService-Info.plist

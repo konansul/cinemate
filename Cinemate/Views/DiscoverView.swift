@@ -6,7 +6,7 @@ struct DiscoverView: View {
     @State private var searchVM = SearchViewModel()
     @Query(sort: \TrackedMovie.addedAt, order: .reverse) private var tracked: [TrackedMovie]
 
-    private let grid = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    private let grid = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     private var isSearching: Bool {
         !searchVM.query.trimmingCharacters(in: .whitespaces).isEmpty
@@ -34,6 +34,15 @@ struct DiscoverView: View {
                 .navigationDestination(for: TVShow.self) { show in
                     TVDetailView(show: show)
                 }
+                .navigationDestination(for: CastListRoute.self) { route in
+                    CastListView(movie: route.movie, cast: route.cast)
+                }
+                .navigationDestination(for: ReviewsRoute.self) { route in
+                    ReviewsView(movie: route.movie, reviews: route.reviews)
+                }
+                .navigationDestination(for: DiscoverFeed.self) { feed in
+                    FeedGridView(feed: feed)
+                }
                 .toolbar(.hidden, for: .navigationBar)
                 .task {
                     if viewModel.isEmpty { await viewModel.load() }
@@ -52,6 +61,7 @@ struct DiscoverView: View {
                         viewModel.forYou = []
                     }
                 }
+                .onAppear { AppAnalytics.screen("Discover") }
         }
     }
 
@@ -83,13 +93,13 @@ struct DiscoverView: View {
                         searchResults
                     } else {
                         genreRow
-                        MixedCarouselRow(title: "Trending This Week", items: viewModel.trendingMixed)
+                        MixedCarouselRow(title: "Trending This Week", items: viewModel.trendingMixed, feed: .trending)
                         MovieCarouselRow(title: "For You", movies: viewModel.forYou)
-                        MixedCarouselRow(title: "Popular", items: viewModel.popularMixed)
+                        MixedCarouselRow(title: "Popular", items: viewModel.popularMixed, feed: .popular)
                         franchisesRow
-                        ShowCarouselRow(title: "TV Shows", shows: viewModel.tvShows)
-                        MovieCarouselRow(title: "Top Rated", movies: viewModel.topRated)
-                        MovieCarouselRow(title: "Upcoming", movies: viewModel.upcoming)
+                        ShowCarouselRow(title: "TV Shows", shows: viewModel.tvShows, feed: .tvShows)
+                        MovieCarouselRow(title: "Top Rated", movies: viewModel.topRated, feed: .topRated)
+                        MovieCarouselRow(title: "Upcoming", movies: viewModel.upcoming, feed: .upcoming)
                     }
                 }
                 .padding(.bottom)

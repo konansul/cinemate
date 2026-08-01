@@ -47,6 +47,7 @@ struct PersonDetailView: View {
         }
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .task { await viewModel.load() }
     }
 

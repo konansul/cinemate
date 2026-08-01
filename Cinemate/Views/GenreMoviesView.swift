@@ -3,7 +3,7 @@ import SwiftUI
 struct GenreMoviesView: View {
     let genre: Genre
     @State private var viewModel = GenreMoviesViewModel()
-    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     var body: some View {
         ScrollView {
@@ -40,6 +40,7 @@ struct GenreMoviesView: View {
         }
         .navigationTitle(genre.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .task { await viewModel.start(genreId: genre.id) }
     }
 }

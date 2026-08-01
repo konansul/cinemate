@@ -23,5 +23,6 @@ struct CastListView: View {
         }
         .navigationTitle("Cast")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
     }
 }

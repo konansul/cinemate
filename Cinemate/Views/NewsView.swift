@@ -11,6 +11,7 @@ struct NewsView: View {
                 .task {
                     if viewModel.items.isEmpty { await viewModel.load() }
                 }
+                .onAppear { AppAnalytics.screen("News") }
         }
     }
 
@@ -52,14 +53,17 @@ struct NewsView: View {
 
 struct NewsRow: View {
     let item: NewsItem
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    private var big: Bool { sizeClass == .regular }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: big ? 14 : 12) {
             thumbnail
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: big ? 8 : 6) {
                 Text(item.title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(big ? .body.weight(.semibold) : .subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3)
@@ -72,13 +76,13 @@ struct NewsRow: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                .font(.caption)
+                .font(big ? .footnote : .caption)
 
                 Spacer(minLength: 0)
             }
         }
         .padding(.horizontal)
-        .padding(.vertical, 12)
+        .padding(.vertical, big ? 16 : 12)
         .contentShape(Rectangle())
     }
 
@@ -89,11 +93,11 @@ struct NewsRow: View {
             ZStack {
                 Rectangle().fill(Color.gray.opacity(0.15))
                 Image(systemName: "newspaper")
-                    .font(.title3)
+                    .font(big ? .title2 : .title3)
                     .foregroundStyle(.secondary)
             }
         }
-        .frame(width: 108, height: 80)
+        .frame(width: big ? 140 : 108, height: big ? 100 : 80)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

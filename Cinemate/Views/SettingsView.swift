@@ -1,36 +1,21 @@
 import SwiftUI
-import UserNotifications
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
-    @State private var remindersEnabled = false
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
+    static let privacyPolicyURL = URL(string: "https://konansul.github.io/cinemate-legal/privacy.html")!
+    static let termsOfUseURL = URL(string: "https://konansul.github.io/cinemate-legal/terms.html")!
 
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack {
-                        Label("Release reminders", systemImage: "bell.badge")
-                        Spacer()
-                        Text(remindersEnabled ? "On" : "Off")
-                            .foregroundStyle(remindersEnabled ? .green : .secondary)
-                    }
-                    if !remindersEnabled {
-                        Button("Turn on in Settings") {
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                openURL(url)
-                            }
-                        }
-                    }
-                } header: {
-                    Text("Notifications")
-                } footer: {
-                    Text("Get notified on release day for upcoming movies you add to your Watchlist.")
-                }
-
                 Section("About") {
                     LabeledContent("Version", value: appVersion)
+                    Button("Show intro again") {
+                        hasCompletedOnboarding = false
+                        dismiss()
+                    }
                 }
 
                 Section("Data & Attribution") {
@@ -42,12 +27,18 @@ struct SettingsView: View {
                         Label("The Movie Database (TMDB)", systemImage: "link")
                     }
                 }
+
+                Section("Legal") {
+                    Link(destination: Self.privacyPolicyURL) {
+                        Label("Privacy Policy", systemImage: "hand.raised")
+                    }
+                    Link(destination: Self.termsOfUseURL) {
+                        Label("Terms of Use", systemImage: "doc.text")
+                    }
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .task {
-                remindersEnabled = await NotificationManager.shared.isAuthorized()
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }

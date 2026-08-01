@@ -3,7 +3,7 @@ import SwiftUI
 struct CollectionView: View {
     let collection: BelongsToCollection
     @State private var viewModel: CollectionViewModel
-    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     init(collection: BelongsToCollection) {
         self.collection = collection
@@ -17,15 +17,17 @@ struct CollectionView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if let backdrop = TMDBConfig.backdropURL(backdropPath) {
-                    AsyncImage(url: backdrop) { image in
-                        image.resizable().aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Rectangle().fill(Color.gray.opacity(0.2))
-                    }
-                    .frame(height: 200)
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    Color.clear
+                        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                        .overlay {
+                            AsyncImage(url: backdrop) { image in
+                                image.resizable().scaledToFill()
+                            } placeholder: {
+                                Rectangle().fill(Color.gray.opacity(0.2))
+                            }
+                        }
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
 
                 if let overview = viewModel.collection?.overview, !overview.isEmpty {
@@ -54,6 +56,7 @@ struct CollectionView: View {
         }
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .task { await viewModel.load() }
     }
 }

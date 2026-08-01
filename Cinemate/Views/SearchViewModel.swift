@@ -19,5 +19,6 @@ final class SearchViewModel {
         hasSearched = true
         results = (try? await TMDBService.shared.searchMulti(trimmed)) ?? []
         isSearching = false
+        AppAnalytics.search(trimmed)
     }
 }

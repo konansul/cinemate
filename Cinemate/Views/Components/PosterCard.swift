@@ -3,11 +3,16 @@ import SwiftUI
 struct PosterCard: View {
     let movie: Movie
     var width: CGFloat = 120
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    private var cardWidth: CGFloat {
+        sizeClass == .regular ? 168 : width
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             poster
-                .frame(width: width, height: width * 1.5)
+                .frame(width: cardWidth, height: cardWidth * 1.5)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
             Text(movie.title)
@@ -27,7 +32,7 @@ struct PosterCard: View {
             }
             .font(.caption2)
         }
-        .frame(width: width, alignment: .leading)
+        .frame(width: cardWidth, alignment: .leading)
     }
 
     @ViewBuilder

@@ -27,6 +27,8 @@ struct MediaItem: Identifiable, Hashable {
 
 struct MediaListResponse: Decodable {
     let results: [RawMediaItem]
+    let page: Int?
+    let totalPages: Int?
 }
 
 struct RawMediaItem: Decodable {

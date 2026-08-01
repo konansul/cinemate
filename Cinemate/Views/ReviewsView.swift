@@ -29,5 +29,6 @@ struct ReviewsView: View {
         }
         .navigationTitle("Reviews")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
     }
 }

@@ -6,14 +6,64 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		56A778AD301A112C004B60C4 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A778AC301A112C004B60C4 /* WidgetKit.framework */; };
+		56A778AF301A112C004B60C4 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A778AE301A112C004B60C4 /* SwiftUI.framework */; };
+		56A778C0301A112E004B60C4 /* CinemateWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 56A778AA301A112C004B60C4 /* CinemateWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		56A77957301A22E0004B60C4 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 56A77956301A22E0004B60C4 /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		56A778BE301A112E004B60C4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 56A778A9301A112C004B60C4;
+			remoteInfo = CinemateWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		56A778C5301A112E004B60C4 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				56A778C0301A112E004B60C4 /* CinemateWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* Cinemate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cinemate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		56A778AA301A112C004B60C4 /* CinemateWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CinemateWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		56A778AC301A112C004B60C4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		56A778AE301A112C004B60C4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		56A778C1301A112E004B60C4 /* Exceptions for "CinemateWidget" folder in "CinemateWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 56A778A9301A112C004B60C4 /* CinemateWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		000000000000000000000010 /* Cinemate */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Cinemate;
+			sourceTree = "<group>";
+		};
+		56A778B0301A112C004B60C4 /* CinemateWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				56A778C1301A112E004B60C4 /* Exceptions for "CinemateWidget" folder in "CinemateWidgetExtension" target */,
+			);
+			path = CinemateWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -22,6 +72,14 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				56A77957301A22E0004B60C4 /* FirebaseAnalytics in Frameworks */,
+			);
+		};
+		56A778A7301A112C004B60C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				56A778AF301A112C004B60C4 /* SwiftUI.framework in Frameworks */,
+				56A778AD301A112C004B60C4 /* WidgetKit.framework in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -31,6 +89,8 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000010 /* Cinemate */,
+				56A778B0301A112C004B60C4 /* CinemateWidget */,
+				56A778AB301A112C004B60C4 /* Frameworks */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,8 +99,18 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000120 /* Cinemate.app */,
+				56A778AA301A112C004B60C4 /* CinemateWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		56A778AB301A112C004B60C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				56A778AC301A112C004B60C4 /* WidgetKit.framework */,
+				56A778AE301A112C004B60C4 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -53,16 +123,41 @@
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
 				000000000000000140000000 /* Resources */,
+				56A778C5301A112E004B60C4 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				56A778BF301A112E004B60C4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* Cinemate */,
 			);
 			name = Cinemate;
+			packageProductDependencies = (
+				56A77956301A22E0004B60C4 /* FirebaseAnalytics */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* Cinemate.app */;
 			productType = "com.apple.product-type.application";
+		};
+		56A778A9301A112C004B60C4 /* CinemateWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 56A778C2301A112E004B60C4 /* Build configuration list for PBXNativeTarget "CinemateWidgetExtension" */;
+			buildPhases = (
+				56A778A6301A112C004B60C4 /* Sources */,
+				56A778A7301A112C004B60C4 /* Frameworks */,
+				56A778A8301A112C004B60C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				56A778B0301A112C004B60C4 /* CinemateWidget */,
+			);
+			name = CinemateWidgetExtension;
+			productName = CinemateWidgetExtension;
+			productReference = 56A778AA301A112C004B60C4 /* CinemateWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -71,11 +166,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					000000000000000100000000 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					56A778A9301A112C004B60C4 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -88,18 +186,27 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				56A77955301A22E0004B60C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				000000000000000100000000 /* Cinemate */,
+				56A778A9301A112C004B60C4 /* CinemateWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		000000000000000140000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		56A778A8301A112C004B60C4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -112,7 +219,20 @@
 			files = (
 			);
 		};
+		56A778A6301A112C004B60C4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		56A778BF301A112E004B60C4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 56A778A9301A112C004B60C4 /* CinemateWidgetExtension */;
+			targetProxy = 56A778BE301A112E004B60C4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		000000000000000011000000 /* Debug configuration for PBXProject "Cinemate" */ = {
@@ -250,6 +370,7 @@
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Cinemate" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Cinemate/Cinemate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -290,6 +411,7 @@
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "Cinemate" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Cinemate/Cinemate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -327,6 +449,71 @@
 			};
 			name = Release;
 		};
+		56A778C3301A112E004B60C4 /* Debug configuration for PBXNativeTarget "CinemateWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CinemateWidget/CinemateWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LGGGHSV7V8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CinemateWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CinemateWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ksultanov.cinemate.CinemateWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		56A778C4301A112E004B60C4 /* Release configuration for PBXNativeTarget "CinemateWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CinemateWidget/CinemateWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LGGGHSV7V8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CinemateWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CinemateWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ksultanov.cinemate.CinemateWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -346,7 +533,34 @@
 			);
 			defaultConfigurationName = Release;
 		};
+		56A778C2301A112E004B60C4 /* Build configuration list for PBXNativeTarget "CinemateWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56A778C3301A112E004B60C4 /* Debug configuration for PBXNativeTarget "CinemateWidgetExtension" */,
+				56A778C4301A112E004B60C4 /* Release configuration for PBXNativeTarget "CinemateWidgetExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		56A77955301A22E0004B60C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.17.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		56A77956301A22E0004B60C4 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A77955301A22E0004B60C4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }

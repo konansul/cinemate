@@ -3,13 +3,12 @@ import SwiftUI
 struct MixedCarouselRow: View {
     let title: String
     let items: [MediaItem]
+    var feed: DiscoverFeed? = nil
 
     var body: some View {
         if !items.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text(title)
-                    .font(.title2.bold())
-                    .padding(.horizontal)
+                CarouselHeader(title: title, feed: feed)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 14) {
