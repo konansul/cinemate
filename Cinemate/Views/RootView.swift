@@ -11,6 +11,21 @@ struct RootView: View {
     }
 
     var body: some View {
+        tabs
+        .task {
+            if hasCompletedOnboarding {
+                await enableDailyNudges()
+            }
+        }
+        .fullScreenCover(isPresented: showOnboarding) {
+            OnboardingView {
+                hasCompletedOnboarding = true
+                Task { await enableDailyNudges() }
+            }
+        }
+    }
+
+    private var tabs: some View {
         TabView {
             Tab("Discover", systemImage: "film") {
                 DiscoverView()
@@ -23,17 +38,6 @@ struct RootView: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
-        .task {
-            if hasCompletedOnboarding {
-                await enableDailyNudges()
-            }
-        }
-        .fullScreenCover(isPresented: showOnboarding) {
-            OnboardingView {
-                hasCompletedOnboarding = true
-                Task { await enableDailyNudges() }
-            }
-        }
     }
 
     private func enableDailyNudges() async {

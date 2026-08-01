@@ -26,6 +26,6 @@ struct InlineSearchBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .glassEffect(.regular, in: Capsule())
+        .glassBackground(in: Capsule())
     }
 }

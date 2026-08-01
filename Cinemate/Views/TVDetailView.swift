@@ -186,7 +186,7 @@ struct TVDetailView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
             .foregroundStyle(active ? color : .white)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+            .glassBackground(in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
     }
