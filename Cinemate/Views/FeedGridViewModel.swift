@@ -53,6 +53,9 @@ final class FeedGridViewModel {
         case .tvShows:
             let response = try await TMDBService.shared.trendingTVPaged(page: page)
             return (response.results.map { MediaItem(show: $0) }, response.page, response.totalPages)
+        case .forYou(let seedId):
+            let response = try await TMDBService.shared.recommendationsPaged(id: seedId, page: page)
+            return (response.results.map { MediaItem(movie: $0) }, response.page, response.totalPages)
         }
     }
 }

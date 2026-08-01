@@ -6,6 +6,7 @@ final class DiscoverViewModel {
     var trendingMixed: [MediaItem] = []
     var popularMixed: [MediaItem] = []
     var forYou: [Movie] = []
+    private(set) var forYouSeedId: Int?
     var topRated: [Movie] = []
     var upcoming: [Movie] = []
     var franchises: [MovieCollection] = []
@@ -46,11 +47,19 @@ final class DiscoverViewModel {
         isLoading = false
     }
 
-    func loadForYou(seedId: Int) async {
+    func refreshForYou(trackedSeed: Int?) async {
+        guard let seedId = trackedSeed ?? fallbackSeedId, seedId != forYouSeedId else { return }
+        forYouSeedId = seedId
         forYou = (try? await TMDBService.shared.recommendations(id: seedId)) ?? []
         WidgetBridge.saveForYou(forYou.map {
             WidgetFeedItem(title: $0.title, posterPath: $0.posterPath, backdropPath: $0.backdropPath, isTV: false)
         })
+    }
+
+    private var fallbackSeedId: Int? {
+        trendingMixed.compactMap(\.movie).first?.id
+            ?? popularMixed.compactMap(\.movie).first?.id
+            ?? topRated.first?.id
     }
 
     func loadFranchises() async {

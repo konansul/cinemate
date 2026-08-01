@@ -1,11 +1,12 @@
 import SwiftUI
 
-enum DiscoverFeed: String, Hashable {
+enum DiscoverFeed: Hashable {
     case trending
     case popular
     case topRated
     case upcoming
     case tvShows
+    case forYou(seedId: Int)
 
     var title: String {
         switch self {
@@ -14,6 +15,7 @@ enum DiscoverFeed: String, Hashable {
         case .topRated: return "Top Rated"
         case .upcoming: return "Upcoming"
         case .tvShows:  return "TV Shows"
+        case .forYou:   return "For You"
         }
     }
 }

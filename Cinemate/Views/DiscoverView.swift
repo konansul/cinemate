@@ -16,6 +16,10 @@ struct DiscoverView: View {
         tracked.first { $0.isFavorite } ?? tracked.first { $0.isWatched } ?? tracked.first
     }
 
+    private var forYouFeed: DiscoverFeed? {
+        viewModel.forYouSeedId.map { .forYou(seedId: $0) }
+    }
+
     var body: some View {
         NavigationStack {
             content
@@ -43,9 +47,13 @@ struct DiscoverView: View {
                 .navigationDestination(for: DiscoverFeed.self) { feed in
                     FeedGridView(feed: feed)
                 }
+                .navigationDestination(for: FranchisesRoute.self) { route in
+                    FranchiseGridView(collections: route.collections)
+                }
                 .toolbar(.hidden, for: .navigationBar)
                 .task {
                     if viewModel.isEmpty { await viewModel.load() }
+                    await viewModel.refreshForYou(trackedSeed: forYouSeed?.id)
                 }
                 .task {
                     await viewModel.loadFranchises()
@@ -55,11 +63,7 @@ struct DiscoverView: View {
                     await searchVM.search()
                 }
                 .task(id: forYouSeed?.id) {
-                    if let seed = forYouSeed {
-                        await viewModel.loadForYou(seedId: seed.id)
-                    } else {
-                        viewModel.forYou = []
-                    }
+                    await viewModel.refreshForYou(trackedSeed: forYouSeed?.id)
                 }
                 .onAppear { AppAnalytics.screen("Discover") }
         }
@@ -94,7 +98,7 @@ struct DiscoverView: View {
                     } else {
                         genreRow
                         MixedCarouselRow(title: "Trending This Week", items: viewModel.trendingMixed, feed: .trending)
-                        MovieCarouselRow(title: "For You", movies: viewModel.forYou)
+                        MovieCarouselRow(title: "For You", movies: viewModel.forYou, feed: forYouFeed)
                         MixedCarouselRow(title: "Popular", items: viewModel.popularMixed, feed: .popular)
                         franchisesRow
                         ShowCarouselRow(title: "TV Shows", shows: viewModel.tvShows, feed: .tvShows)
@@ -112,9 +116,18 @@ struct DiscoverView: View {
     private var franchisesRow: some View {
         if !viewModel.franchises.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Franchises")
-                    .font(.title2.bold())
-                    .padding(.horizontal)
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Franchises")
+                        .font(.title2.bold())
+                    Spacer()
+                    NavigationLink(value: FranchisesRoute(collections: viewModel.franchises)) {
+                        Text("See all")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.blue)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal)
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 14) {
                         ForEach(viewModel.franchises) { collection in
