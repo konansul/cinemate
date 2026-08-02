@@ -2,7 +2,12 @@ import SwiftUI
 
 struct CollectionCard: View {
     let collection: MovieCollection
-    var width: CGFloat = 130
+    var width: CGFloat? = nil
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    private var cardWidth: CGFloat {
+        width ?? (sizeClass == .regular ? 168 : 120)
+    }
 
     private var displayName: String {
         collection.name.replacingOccurrences(of: " Collection", with: "")
@@ -21,7 +26,7 @@ struct CollectionCard: View {
         NavigationLink(value: navValue) {
             VStack(alignment: .leading, spacing: 6) {
                 poster
-                    .frame(width: width, height: width * 1.5)
+                    .frame(width: cardWidth, height: cardWidth * 1.5)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(alignment: .topLeading) {
                         Image(systemName: "square.stack.3d.up.fill")
@@ -40,7 +45,7 @@ struct CollectionCard: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
-            .frame(width: width, alignment: .leading)
+            .frame(width: cardWidth, alignment: .leading)
         }
         .buttonStyle(HapticButtonStyle())
     }
