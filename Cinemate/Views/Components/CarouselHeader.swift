@@ -15,7 +15,7 @@ struct CarouselHeader: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.blue)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(HapticButtonStyle())
             }
         }
         .padding(.horizontal)

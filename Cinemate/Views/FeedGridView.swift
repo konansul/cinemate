@@ -67,12 +67,14 @@ struct FeedGridView: View {
             NavigationLink(value: show) {
                 GridPosterCard(movie: show.asMovie)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(HapticButtonStyle())
+            .accessibilityIdentifier("gridPosterCard")
         } else if let movie = item.movie {
             NavigationLink(value: movie) {
                 GridPosterCard(movie: movie)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(HapticButtonStyle())
+            .accessibilityIdentifier("gridPosterCard")
         }
     }
 }

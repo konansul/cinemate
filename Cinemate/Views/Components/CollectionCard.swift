@@ -42,7 +42,7 @@ struct CollectionCard: View {
             }
             .frame(width: width, alignment: .leading)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(HapticButtonStyle())
     }
 
     @ViewBuilder

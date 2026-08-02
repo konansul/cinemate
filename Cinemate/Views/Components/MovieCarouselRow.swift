@@ -16,7 +16,8 @@ struct MovieCarouselRow: View {
                             NavigationLink(value: movie) {
                                 PosterCard(movie: movie)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(HapticButtonStyle())
+                            .accessibilityIdentifier("posterCard")
                         }
                     }
                     .padding(.horizontal)

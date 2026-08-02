@@ -17,12 +17,14 @@ struct MixedCarouselRow: View {
                                 NavigationLink(value: show) {
                                     PosterCard(movie: show.asMovie)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(HapticButtonStyle())
+                                .accessibilityIdentifier("posterCard")
                             } else if let movie = item.movie {
                                 NavigationLink(value: movie) {
                                     PosterCard(movie: movie)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(HapticButtonStyle())
+                                .accessibilityIdentifier("posterCard")
                             }
                         }
                     }

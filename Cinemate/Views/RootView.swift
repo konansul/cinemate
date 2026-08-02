@@ -41,6 +41,9 @@ struct RootView: View {
     }
 
     private func enableDailyNudges() async {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-skipNotificationPrompt") { return }
+        #endif
         _ = await NotificationManager.shared.requestAuthorization()
         await NotificationManager.shared.refreshDailyNudges()
     }

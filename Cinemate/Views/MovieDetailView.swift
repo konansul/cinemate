@@ -201,19 +201,19 @@ struct MovieDetailView: View {
 
     private var overlayActions: some View {
         HStack(spacing: 10) {
-            overlayButton("Favorite",
+            overlayButton("Favorite", identifier: "favoriteButton",
                           systemImage: record?.isFavorite == true ? "heart.fill" : "heart",
                           color: .red, active: record?.isFavorite == true, action: toggleFavorite)
-            overlayButton("Watched",
+            overlayButton("Watched", identifier: "watchedButton",
                           systemImage: record?.isWatched == true ? "checkmark.circle.fill" : "checkmark.circle",
                           color: .green, active: record?.isWatched == true, action: toggleWatched)
-            overlayButton("Watchlist",
+            overlayButton("Watchlist", identifier: "watchlistButton",
                           systemImage: record?.inWatchlist == true ? "bookmark.fill" : "bookmark",
                           color: .blue, active: record?.inWatchlist == true, action: toggleWatchlist)
         }
     }
 
-    private func overlayButton(_ title: String, systemImage: String, color: Color, active: Bool, action: @escaping () -> Void) -> some View {
+    private func overlayButton(_ title: String, identifier: String, systemImage: String, color: Color, active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 5) {
                 Image(systemName: systemImage).font(.title3)
@@ -225,6 +225,7 @@ struct MovieDetailView: View {
             .glassBackground(in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
     }
 
     private var ratingRow: some View {
@@ -385,6 +386,7 @@ struct MovieDetailView: View {
         let r = ensureRecord()
         r.inWatchlist.toggle()
         let isOn = r.inWatchlist
+        Haptics.toggle(on: isOn)
         pruneIfEmpty(r)
         AppAnalytics.trackAction("watchlist", id: movie.id, mediaType: "movie")
         Task {
@@ -403,16 +405,20 @@ struct MovieDetailView: View {
         let r = ensureRecord()
         r.isWatched.toggle()
         r.watchedDate = r.isWatched ? Date() : nil
+        Haptics.toggle(on: r.isWatched)
         pruneIfEmpty(r)
         AppAnalytics.trackAction("watched", id: movie.id, mediaType: "movie")
     }
 
     private func toggleFavorite() {
-        let r = ensureRecord(); r.isFavorite.toggle(); pruneIfEmpty(r)
+        let r = ensureRecord(); r.isFavorite.toggle()
+        Haptics.toggle(on: r.isFavorite)
+        pruneIfEmpty(r)
         AppAnalytics.trackAction("favorite", id: movie.id, mediaType: "movie")
     }
 
     private func setRating(_ value: Int) {
+        Haptics.select()
         let r = ensureRecord(); r.userRating = value; pruneIfEmpty(r)
     }
 

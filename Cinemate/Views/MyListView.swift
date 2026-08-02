@@ -101,12 +101,14 @@ struct MyListView: View {
                         NavigationLink(value: item.asShow) {
                             GridPosterCard(movie: item.asShow.asMovie)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(HapticButtonStyle())
+                        .accessibilityIdentifier("gridPosterCard")
                     } else {
                         NavigationLink(value: item.asMovie) {
                             GridPosterCard(movie: item.asMovie)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(HapticButtonStyle())
+                        .accessibilityIdentifier("gridPosterCard")
                     }
                 }
             }
@@ -163,6 +165,7 @@ struct MyListView: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("filter-\(option.rawValue)")
     }
 
     private var emptyTitle: String {

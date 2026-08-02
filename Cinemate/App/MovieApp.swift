@@ -6,6 +6,11 @@ import FirebaseCore
 struct MovieApp: App {
     init() {
         FirebaseApp.configure()
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-resetOnboarding") {
+            UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
+        }
+        #endif
     }
 
     var body: some Scene {

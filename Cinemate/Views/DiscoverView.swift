@@ -125,7 +125,7 @@ struct DiscoverView: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.blue)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(HapticButtonStyle())
                 }
                 .padding(.horizontal)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -174,12 +174,14 @@ struct DiscoverView: View {
                         NavigationLink(value: show) {
                             GridPosterCard(movie: show.asMovie)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(HapticButtonStyle())
+                        .accessibilityIdentifier("gridPosterCard")
                     } else if let movie = item.movie {
                         NavigationLink(value: movie) {
                             GridPosterCard(movie: movie)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(HapticButtonStyle())
+                        .accessibilityIdentifier("gridPosterCard")
                     }
                 }
             }

@@ -28,7 +28,7 @@ struct OnboardingView: View {
                 HStack {
                     Spacer()
                     if page < pages.count - 1 {
-                        Button("Skip") { onFinish() }
+                        Button("Skip") { Haptics.tap(); onFinish() }
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                     }
@@ -47,6 +47,7 @@ struct OnboardingView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .frame(height: 200)
                 .animation(.easeInOut, value: page)
+                .sensoryFeedback(.selection, trigger: page)
 
                 dots.padding(.vertical, 18)
 
@@ -97,6 +98,7 @@ struct OnboardingView: View {
         if page < pages.count - 1 {
             withAnimation { page += 1 }
         } else {
+            Haptics.tap()
             onFinish()
         }
     }

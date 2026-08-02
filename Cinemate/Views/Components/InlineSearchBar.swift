@@ -13,6 +13,7 @@ struct InlineSearchBar: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
+                .accessibilityIdentifier("searchField")
 
             if !text.isEmpty {
                 Button {

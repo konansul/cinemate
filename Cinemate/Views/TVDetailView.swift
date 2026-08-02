@@ -358,7 +358,9 @@ struct TVDetailView: View {
     }
 
     private func toggleWatchlist() {
-        let r = ensureRecord(); r.inWatchlist.toggle(); pruneIfEmpty(r)
+        let r = ensureRecord(); r.inWatchlist.toggle()
+        Haptics.toggle(on: r.inWatchlist)
+        pruneIfEmpty(r)
         AppAnalytics.trackAction("watchlist", id: show.id, mediaType: "tv")
     }
 
@@ -366,16 +368,20 @@ struct TVDetailView: View {
         let r = ensureRecord()
         r.isWatched.toggle()
         r.watchedDate = r.isWatched ? Date() : nil
+        Haptics.toggle(on: r.isWatched)
         pruneIfEmpty(r)
         AppAnalytics.trackAction("watched", id: show.id, mediaType: "tv")
     }
 
     private func toggleFavorite() {
-        let r = ensureRecord(); r.isFavorite.toggle(); pruneIfEmpty(r)
+        let r = ensureRecord(); r.isFavorite.toggle()
+        Haptics.toggle(on: r.isFavorite)
+        pruneIfEmpty(r)
         AppAnalytics.trackAction("favorite", id: show.id, mediaType: "tv")
     }
 
     private func setRating(_ value: Int) {
+        Haptics.select()
         let r = ensureRecord(); r.userRating = value; pruneIfEmpty(r)
     }
 
