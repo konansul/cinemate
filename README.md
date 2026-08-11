@@ -9,13 +9,13 @@ Discover what is trending, search across films and shows, open a detail screen w
 
 ## Screenshots
 
-| Discover | Detail | Rating, notes & collections | Search |
-|---|---|---|---|
-| ![Discover](docs/screenshots/02-discover.png) | ![Detail](docs/screenshots/03-detail.png) | ![Notes and collections](docs/screenshots/04-detail-cast.png) | ![Search](docs/screenshots/05-search.png) |
-
-| Library | News | Onboarding |
+| Onboarding | Discover | Detail |
 |---|---|---|
-| ![Library](docs/screenshots/06-library.png) | ![News](docs/screenshots/07-news.png) | ![Onboarding](docs/screenshots/01-onboarding.png) |
+| ![Onboarding](docs/screenshots/01-onboarding.jpg) | ![Discover](docs/screenshots/02-discover.jpg) | ![Detail](docs/screenshots/03-detail.jpg) |
+
+| Rating, notes & collections | Search | Library | News |
+|---|---|---|---|
+| ![Rating, notes and collections](docs/screenshots/04-detail-cast.jpg) | ![Search](docs/screenshots/05-search.jpg) | ![Library](docs/screenshots/06-library.jpg) | ![News](docs/screenshots/07-news.jpg) |
 
 ## Features
 
