@@ -4,7 +4,8 @@ A movie and TV tracker for iPhone and iPad, built in Swift and SwiftUI on top of
 
 Discover what is trending, search across films and shows, open a detail screen with cast, trailers and streaming providers, and keep your own library of what you want to watch, what you have watched and what you loved. Everything you track is stored on device with SwiftData and synced across your devices through iCloud.
 
-**Status:** submitted to the App Store, currently in review.
+**On the App Store:** [apps.apple.com/us/app/cinemate-movie-tracker](https://apps.apple.com/us/app/cinemate-movie-tracker/id6797075352)
+
 **Free app, no ads, no in-app purchases.**
 
 ## Screenshots
@@ -19,16 +20,16 @@ Discover what is trending, search across films and shows, open a detail screen w
 
 ## Features
 
-- **Discover** — trending, popular and upcoming carousels that mix films and TV shows, a "For You" row seeded by what you already like, and browse-by-genre chips leading to an infinite-scroll grid.
-- **Search** — one search field across films, shows and people.
-- **Detail screens** — runtime, genres, rating, overview, cast, trailer link, and "where to watch" providers. Tap an actor for their biography and filmography; tap a franchise to see the whole collection in release order.
-- **Tracker** — mark anything as Watchlist, Watched or Favorite, give it a star rating, and attach a private note.
-- **Library** — a stats strip plus filtering and sorting across everything you track.
-- **News** — a movie-news feed with thumbnails, opening in Safari.
-- **Widgets** — two home-screen widgets (Trending and For You) in small and medium sizes, with an interactive button that flips to the next title on demand.
-- **Reminders** — add an unreleased film to your watchlist and Cinemate schedules a local notification for release day.
-- **iCloud sync** — your library follows you across devices, with no account to create.
-- **iPad** — adaptive layouts throughout, including a two-column detail screen and a sidebar-adaptable tab bar.
+- **Discover**: trending, popular and upcoming carousels that mix films and TV shows, a "For You" row seeded by what you already like, and browse-by-genre chips leading to an infinite-scroll grid.
+- **Search**: one search field across films, shows and people.
+- **Detail screens**: runtime, genres, rating, overview, cast, trailer link, and "where to watch" providers. Tap an actor for their biography and filmography; tap a franchise to see the whole collection in release order.
+- **Tracker**: mark anything as Watchlist, Watched or Favorite, give it a star rating, and attach a private note.
+- **Library**: a stats strip plus filtering and sorting across everything you track.
+- **News**: a movie-news feed with thumbnails, opening in Safari.
+- **Widgets**: two home-screen widgets (Trending and For You) in small and medium sizes, with an interactive button that flips to the next title on demand.
+- **Reminders**: add an unreleased film to your watchlist and Cinemate schedules a local notification for release day.
+- **iCloud sync**: your library follows you across devices, with no account to create.
+- **iPad**: adaptive layouts throughout, including a two-column detail screen and a sidebar-adaptable tab bar.
 
 ## Tech
 
@@ -73,8 +74,12 @@ Requires Xcode 26 or newer and an iOS 18+ device or simulator.
 
 3. Open `Cinemate.xcodeproj` and run the `Cinemate` scheme.
 
-Firebase Analytics is optional — the app runs without `GoogleService-Info.plist`.
+Firebase Analytics is optional: the app runs without `GoogleService-Info.plist`.
 
 ## Attribution
 
 This product uses the TMDB API but is not endorsed or certified by TMDB. Streaming availability data is provided by JustWatch.
+
+## Legal
+
+[Privacy Policy](https://konansul.github.io/cinemate-legal/privacy.html) · [Terms of Use](https://konansul.github.io/cinemate-legal/terms.html)
